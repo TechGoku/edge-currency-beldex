@@ -654,7 +654,7 @@ export class BeldexEngine implements EdgeCurrencyEngine {
     }
 
     const options: CreateTransactionOptions = {
-      amount: div(nativeAmount, '1000000000000', 12),
+      amount: div(nativeAmount, '100000000', 9),
       isSweepTx: false,
       priority: translateFee(edgeSpendInfo.networkFeeOption),
       targetAddress: publicAddress
