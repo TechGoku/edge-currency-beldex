@@ -1,11 +1,11 @@
 import type { EdgeTransaction } from 'edge-core-js'
 
-import { currencyInfo } from './moneroInfo'
+import { currencyInfo } from './beldexInfo'
 
 export const DATA_STORE_FILE = 'txEngineFolder/walletLocalData.json'
 export const PRIMARY_CURRENCY = currencyInfo.currencyCode
 
-export class MoneroLocalData {
+export class BeldexLocalData {
   blockHeight: number
   lastAddressQueryHeight: number
   lockedXmrBalance: string

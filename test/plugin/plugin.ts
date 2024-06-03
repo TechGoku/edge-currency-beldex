@@ -60,7 +60,7 @@ for (const fixture of fixtures) {
     nativeIo,
     pluginDisklet: fakeIo.disklet
   }
-  const factory = edgeCorePlugins[fixture.pluginName as 'monero']
+  const factory = edgeCorePlugins[fixture.pluginName as 'beldex']
   const plugin: EdgeCurrencyPlugin = factory(opts)
 
   describe(`Info for Wallet type ${WALLET_TYPE}`, function () {
@@ -81,8 +81,8 @@ for (const fixture of fixtures) {
     it('Create valid key', async function () {
       const keys = await tools.createPrivateKey(WALLET_TYPE)
       assert.equal(typeof keys[keyName], 'string')
-      const length1 = keys.moneroSpendKeyPrivate.length
-      const length2 = keys.moneroSpendKeyPublic.length
+      const length1 = keys.beldexSpendKeyPrivate.length
+      const length2 = keys.beldexSpendKeyPublic.length
       assert.equal(length1, 64)
       assert.equal(length2, 64)
     })

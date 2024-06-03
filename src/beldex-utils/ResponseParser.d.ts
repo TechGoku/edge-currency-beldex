@@ -3,7 +3,7 @@
 // manually define its types here rather than converting the code
 // to TypeScript:
 
-import type { ParsedTransaction } from '../MyMoneroApi'
+import type { ParsedTransaction } from '../BeldexApi'
 
 export async function Parsed_AddressTransactions__async(
   keyImage_cache: { [keyId: string]: string },

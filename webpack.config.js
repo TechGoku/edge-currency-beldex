@@ -22,7 +22,7 @@ module.exports = {
     ]
   },
   output: {
-    filename: 'edge-currency-monero.ts',
+    filename: 'edge-currency-beldex.ts',
     path: path.join(path.resolve(__dirname), 'lib/react-native')
   },
   resolve: {

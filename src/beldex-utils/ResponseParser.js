@@ -1,4 +1,4 @@
-// This has been taken from @mymonero/mymonero-response-parser-utils v2.0.0
+// This has been taken from @bdxi/beldex-response-parser-utils v1.2.0
 // We have made the "__sync" methods async and deleted the rest.
 
 // Copyright (c) 2014-2019, MyMonero.com
@@ -31,9 +31,9 @@
 //
 'use strict'
 //
-const JSBigInt = require('@mymonero/mymonero-bigint').BigInteger
-const monero_amount_format_utils = require('@mymonero/mymonero-money-format')
-const monero_keyImage_cache_utils = require("./mymonero-keyimage-cache.js")
+const JSBigInt = require('@bdxi/beldex-bigint').BigInteger
+const beldex_amount_format_utils = require('@bdxi/beldex-money-format')
+const beldex_keyImage_cache_utils = require("./beldex-keyimage-cache.js")
 //
 async function Parsed_AddressInfo__async (
   keyImage_cache,
@@ -57,7 +57,7 @@ async function Parsed_AddressInfo__async (
   const spent_outputs = data.spent_outputs || []
   //
   for (let spent_output of spent_outputs) {
-    var key_image = await monero_keyImage_cache_utils.Lazy_KeyImage(
+    var key_image = await beldex_keyImage_cache_utils.Lazy_KeyImage(
       keyImage_cache,
       spent_output.tx_pub_key,
       spent_output.out_index,
@@ -118,7 +118,7 @@ async function Parsed_AddressTransactions__async (
   for (let i = 0; i < transactions.length; ++i) {
     if ((transactions[i].spent_outputs || []).length > 0) {
       for (var j = 0; j < transactions[i].spent_outputs.length; ++j) {
-        var key_image = await monero_keyImage_cache_utils.Lazy_KeyImage(
+        var key_image = await beldex_keyImage_cache_utils.Lazy_KeyImage(
           keyImage_cache,
           transactions[i].spent_outputs[j].tx_pub_key,
           transactions[i].spent_outputs[j].out_index,
@@ -155,7 +155,7 @@ async function Parsed_AddressTransactions__async (
       .subtract(transactions[i].total_sent || 0)
       .toString()
     transactions[i].approx_float_amount = parseFloat(
-      monero_amount_format_utils.formatMoney(transactions[i].amount)
+      beldex_amount_format_utils.formatMoney(transactions[i].amount)
     )
     transactions[i].timestamp = transactions[i].timestamp
     const record__payment_id = transactions[i].payment_id

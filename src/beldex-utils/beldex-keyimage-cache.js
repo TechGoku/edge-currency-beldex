@@ -1,4 +1,4 @@
-// This has been taken from @mymonero/mymonero-keyimage-cache v2.0.0
+// This has been taken from @bdxi/beldex-keyimage-cache v2.0.0
 // We have made `Lazy_KeyImage` async and deleted the rest.
 // We have also renamed generate_key_image to generateKeyImage.
 

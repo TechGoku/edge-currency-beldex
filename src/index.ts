@@ -2,7 +2,7 @@ import 'regenerator-runtime/runtime'
 
 import type { EdgeCorePlugins } from 'edge-core-js/types'
 
-import { makeMoneroPlugin } from './moneroPlugin'
+import { makeBeldexPlugin } from './beldexPlugin'
 
 declare global {
   interface Window {
@@ -11,7 +11,7 @@ declare global {
 }
 
 const edgeCorePlugins = {
-  monero: makeMoneroPlugin
+  beldex: makeBeldexPlugin
 }
 
 export default edgeCorePlugins

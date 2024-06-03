@@ -10,13 +10,13 @@ import type {
 } from 'edge-core-js/types'
 import type {
   CppBridge as CppBridgeType,
-  NativeMyMoneroCore
-} from 'react-native-mymonero-core'
-import CppBridge from 'react-native-mymonero-core/src/CppBridge'
+  NativeBeldexCore
+} from 'react-native-beldex-core'
+import CppBridge from 'react-native-beldex-core/src/CppBridge'
 import { parse, serialize } from 'uri-js'
 
-import { currencyInfo } from './moneroInfo'
-import type { MoneroNetworkInfo, PrivateKeys, PublicKeys } from './moneroTypes'
+import { currencyInfo } from './beldexInfo'
+import type { BeldexNetworkInfo, PrivateKeys, PublicKeys } from './beldexTypes'
 
 function getDenomInfo(denom: string): EdgeDenomination | undefined {
   return currencyInfo.denominations.find(element => {
@@ -32,12 +32,12 @@ function getParameterByName(param: string, url: string): string | undefined {
   return decodeURIComponent(results[2].replace(/\+/g, ' '))
 }
 
-export class MoneroTools {
+export class BeldexTools {
   cppBridge: CppBridgeType
   io: EdgeIo
   log: EdgeLog
-  networkInfo: MoneroNetworkInfo = {
-    defaultServer: 'https://edge.mymonero.com:8443',
+  networkInfo: BeldexNetworkInfo = {
+    defaultServer: 'https://lwsapi.beldex.io',
     nettype: 'MAINNET'
   }
 
@@ -45,7 +45,7 @@ export class MoneroTools {
     const { io, log, nativeIo } = env
 
     // Grab the raw C++ API and wrap it in argument parsing:
-    const cppModule = nativeIo['edge-currency-monero'] as NativeMyMoneroCore
+    const cppModule = nativeIo['edge-currency-beldex'] as NativeBeldexCore
     this.cppBridge = new CppBridge(cppModule)
 
     this.io = io
@@ -53,7 +53,7 @@ export class MoneroTools {
   }
 
   async createPrivateKey(walletType: string): Promise<PrivateKeys> {
-    if (walletType !== 'wallet:monero') {
+    if (walletType !== 'wallet:beldex') {
       throw new Error('InvalidWalletType')
     }
 
@@ -62,27 +62,27 @@ export class MoneroTools {
       this.networkInfo.nettype
     )
     const privateKeys: PrivateKeys = {
-      moneroKey: result.mnemonic,
-      moneroSpendKeyPrivate: result.privateSpendKey,
-      moneroSpendKeyPublic: result.publicSpendKey
+      beldexKey: result.mnemonic,
+      beldexSpendKeyPrivate: result.privateSpendKey,
+      beldexSpendKeyPublic: result.publicSpendKey
     }
     return privateKeys
   }
 
   async derivePublicKey(walletInfo: EdgeWalletInfo): Promise<PublicKeys> {
-    if (walletInfo.type !== 'wallet:monero') {
+    if (walletInfo.type !== 'wallet:beldex') {
       throw new Error('InvalidWalletType')
     }
 
     const result = await this.cppBridge.seedAndKeysFromMnemonic(
-      walletInfo.keys.moneroKey,
+      walletInfo.keys.beldexKey,
       this.networkInfo.nettype
     )
     const publicKeys: PublicKeys = {
-      moneroAddress: result.address,
-      moneroViewKeyPrivate: result.privateViewKey,
-      moneroViewKeyPublic: result.publicViewKey,
-      moneroSpendKeyPublic: result.publicSpendKey
+      beldexAddress: result.address,
+      beldexViewKeyPrivate: result.privateViewKey,
+      beldexViewKeyPublic: result.publicViewKey,
+      beldexSpendKeyPublic: result.publicSpendKey
     }
     return publicKeys
   }
@@ -95,7 +95,7 @@ export class MoneroTools {
 
     if (
       typeof parsedUri.scheme !== 'undefined' &&
-      parsedUri.scheme !== 'monero'
+      parsedUri.scheme !== 'beldex'
     ) {
       throw new Error('InvalidUriError') // possibly scanning wrong crypto type
     }
@@ -117,13 +117,13 @@ export class MoneroTools {
 
     const amountStr = getParameterByName('amount', uri)
     if (amountStr != null) {
-      const denom = getDenomInfo('XMR')
+      const denom = getDenomInfo('BDX')
       if (denom == null) {
         throw new Error('InternalErrorInvalidCurrencyCode')
       }
       nativeAmount = mul(amountStr, denom.multiplier)
       nativeAmount = toFixed(nativeAmount, 0, 0)
-      currencyCode = 'XMR'
+      currencyCode = 'BDX'
     }
     const uniqueIdentifier = getParameterByName('tx_payment_id', uri)
     const label = getParameterByName('label', uri)
@@ -176,13 +176,13 @@ export class MoneroTools {
       let queryString: string = ''
 
       if (typeof obj.nativeAmount === 'string') {
-        const currencyCode: string = 'XMR'
+        const currencyCode: string = 'BDX'
         const nativeAmount: string = obj.nativeAmount
         const denom = getDenomInfo(currencyCode)
         if (denom == null) {
           throw new Error('InternalErrorInvalidCurrencyCode')
         }
-        const amount = div(nativeAmount, denom.multiplier, 12)
+        const amount = div(nativeAmount, denom.multiplier, 9)
 
         queryString += 'amount=' + amount + '&'
       }
@@ -195,7 +195,7 @@ export class MoneroTools {
       queryString = queryString.substr(0, queryString.length - 1)
 
       const serializeObj = {
-        scheme: 'monero',
+        scheme: 'beldex',
         path: obj.publicAddress,
         query: queryString
       }

@@ -15,11 +15,11 @@ import type {
   CreatedTransaction,
   Nettype,
   Priority
-} from 'react-native-mymonero-core'
+} from 'react-native-beldex-core'
 
-import parserUtils from './mymonero-utils/ResponseParser'
+import parserUtils from './beldex-utils/ResponseParser'
 
-export interface MyMoneroApiOptions {
+export interface BeldexApiOptions {
   apiKey: string
   apiServer: string
   fetch: EdgeFetchFunction
@@ -108,7 +108,7 @@ const asAddressInfoResponse = asObject({
   start_height: asNumber, // Start height of response
   total_received: asString, // Sum of received XMR
   total_sent: asString, // Sum of possibly spent XMR
-  transaction_height: asNumber // Total txes sent in Monero
+  transaction_height: asNumber // Total txes sent in Beldex
 })
 
 const asGetAddressTxsResponse = asObject({
@@ -140,10 +140,10 @@ const asGetAddressTxsResponse = asObject({
 })
 
 /**
- * Methods for talking to the Monero Lightwallet API.
- * See https://github.com/monero-project/meta/blob/master/api/lightwallet_rest.md
+ * Methods for talking to the Beldex Lightwallet API.
+ * See https://github.com/Beldex-Coin/beldex/blob/lws-implementation/src/lws/lightwallet_rest.md
  */
-export class MyMoneroApi {
+export class BeldexApi {
   // Network options:
   apiKey: string
   apiUrl: string
@@ -156,7 +156,7 @@ export class MyMoneroApi {
   // Maps from key identifiers (a bunch of concatenated stuff) to key images:
   keyImageCache: { [keyId: string]: string }
 
-  constructor(cppBridge: CppBridge, options: MyMoneroApiOptions) {
+  constructor(cppBridge: CppBridge, options: BeldexApiOptions) {
     this.apiKey = options.apiKey
     this.apiUrl = options.apiServer
     this.nettype = options.nettype ?? 'MAINNET'
@@ -173,11 +173,11 @@ export class MyMoneroApi {
   }
 
   /**
-   * Authenticates with the MyMonero light-wallet server.
+   * Authenticates with the Beldex light-wallet server.
    */
   async login(keys: WalletKeys): Promise<LoginResult> {
     const { address, privateViewKey } = keys
-    const response = await this.fetchPostMyMonero('login', {
+    const response = await this.fetchPostBeldex('login', {
       address: address,
       api_key: this.apiKey,
       create_account: true,
@@ -190,7 +190,7 @@ export class MyMoneroApi {
 
   async getTransactions(keys: WalletKeys): Promise<ParsedTransaction[]> {
     const { address, privateSpendKey, privateViewKey, publicSpendKey } = keys
-    const response = await this.fetchPostMyMonero('get_address_txs', {
+    const response = await this.fetchPostBeldex('get_address_txs', {
       address,
       api_key: this.apiKey,
       view_key: privateViewKey
@@ -210,7 +210,7 @@ export class MyMoneroApi {
 
   async getAddressInfo(keys: WalletKeys): Promise<BalanceResults> {
     const { address, privateSpendKey, privateViewKey, publicSpendKey } = keys
-    const response = await this.fetchPostMyMonero('get_address_info', {
+    const response = await this.fetchPostBeldex('get_address_info', {
       address,
       api_key: this.apiKey,
       view_key: privateViewKey
@@ -247,12 +247,12 @@ export class MyMoneroApi {
     } = opts
 
     // Grab the UTXO set:
-    const unspentOuts = await this.fetchPostMyMonero('get_unspent_outs', {
+    const unspentOuts = await this.fetchPostBeldex('get_unspent_outs', {
       address,
       amount: '0',
       api_key: this.apiKey,
       dust_threshold: '2000000000',
-      mixin: 15,
+      mixin: 10,
       use_dust: true,
       view_key: privateViewKey
     })
@@ -261,10 +261,10 @@ export class MyMoneroApi {
     const randomOutsCb = async (count: number): Promise<any> => {
       const amounts: string[] = []
       for (let i = 0; i < count; ++i) amounts.push('0')
-      return await this.fetchPostMyMonero('get_random_outs', {
+      return await this.fetchPostBeldex('get_random_outs', {
         amounts,
         api_key: this.apiKey,
-        count: 16
+        count: 10
       })
     }
 
@@ -290,7 +290,7 @@ export class MyMoneroApi {
   }
 
   async broadcastTransaction(tx: string): Promise<void> {
-    await this.fetchPostMyMonero('submit_raw_tx', {
+    await this.fetchPostBeldex('submit_raw_tx', {
       api_key: this.apiKey,
       tx
     })
@@ -299,7 +299,7 @@ export class MyMoneroApi {
   // Private routines
   // ----------------
 
-  async fetchPostMyMonero(cmd: string, params: any): Promise<any> {
+  async fetchPostBeldex(cmd: string, params: any): Promise<any> {
     const url = `${this.apiUrl}/${cmd}`
     const response = await this.fetch(url, {
       body: JSON.stringify(params),

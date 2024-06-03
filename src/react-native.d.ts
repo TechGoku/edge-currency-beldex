@@ -1,6 +1,6 @@
 declare module 'react-native' {
-  import type { NativeMyMoneroCore } from 'react-native-mymonero-core'
+  import type { NativeBeldexCore } from 'react-native-beldex-core'
   declare const NativeModules: {
-    MyMoneroCore: NativeMyMoneroCore
+    BeldexCore: NativeBeldexCore
   }
 }

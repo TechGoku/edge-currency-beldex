@@ -1,6 +1,6 @@
-import makeBridge from '@mymonero/mymonero-monero-client'
+import makeBridge from '@bdxi/beldex-client'
 import type { EdgeNativeIo } from 'edge-core-js/types'
-import type { NativeMyMoneroCore } from 'react-native-mymonero-core'
+import type { NativeBeldexCore } from 'react-native-beldex-core'
 
 const bridgePromise: Promise<any> = makeBridge()
 
@@ -8,8 +8,8 @@ const bridgePromise: Promise<any> = makeBridge()
  * We are emulating the `react-native-mymonero-core` API
  * using the `@mymonero/mymonero-monero-client` WASM module.
  */
-const bridge: NativeMyMoneroCore = {
-  async callMyMonero(name, jsonArguments) {
+const bridge: NativeBeldexCore = {
+  async callBeldex(name, jsonArguments) {
     const bridge = await bridgePromise
     return bridge.Module[name](...jsonArguments)
   },
@@ -34,5 +34,5 @@ const bridge: NativeMyMoneroCore = {
 }
 
 export const nativeIo: EdgeNativeIo = {
-  'edge-currency-monero': bridge
+  'edge-currency-beldex': bridge
 }

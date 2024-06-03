@@ -1,5 +1,5 @@
 /build/
 /coverage/
 /lib/
-/src/mymonero-utils/mymonero-keyimage-cache.js
-/src/mymonero-utils/ResponseParser.js
+/src/beldex-utils/beldex-keyimage-cache.js
+/src/beldex-utils/ResponseParser.js

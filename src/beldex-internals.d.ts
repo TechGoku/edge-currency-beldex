@@ -1,18 +1,18 @@
-declare module '@mymonero/mymonero-monero-client' {
+declare module '@bdxi/beldex-client' {
   declare function makeBridge(): Promise<any>
   export default makeBridge
 }
 
 // We are reaching inside the module to grab stuff,
 // so hack in some type definitions:
-declare module 'react-native-mymonero-core/src/CppBridge' {
+declare module 'react-native-beldex-core/src/CppBridge' {
   import type {
-    NativeMyMoneroCore,
+    NativeBeldexCore,
     CppBridge
-  } from 'react-native-mymonero-core'
+  } from 'react-native-beldex-core'
 
   type CppBridgeConstructor = new (
-    nativeModule: NativeMyMoneroCore
+    nativeModule: NativeBeldexCore
   ) => CppBridge
 
   declare const Constructor: CppBridgeConstructor

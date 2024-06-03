@@ -7,14 +7,14 @@ import type {
   EdgeCurrencyPlugin
 } from 'edge-core-js/types'
 
-import { makeCurrencyEngine } from './MoneroEngine'
-import { currencyInfo } from './moneroInfo'
-import { MoneroTools } from './MoneroTools'
+import { makeCurrencyEngine } from './BeldexEngine'
+import { currencyInfo } from './beldexInfo'
+import { BeldexTools } from './BeldexTools'
 
-export function makeMoneroPlugin(
+export function makeBeldexPlugin(
   env: EdgeCorePluginOptions
 ): EdgeCurrencyPlugin {
-  const tools = new MoneroTools(env)
+  const tools = new BeldexTools(env)
 
   return {
     currencyInfo,

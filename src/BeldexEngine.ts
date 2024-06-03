@@ -28,26 +28,26 @@ import {
   NoAmountSpecifiedError,
   PendingFundsError
 } from 'edge-core-js/types'
-import type { CreatedTransaction, Priority } from 'react-native-mymonero-core'
+import type { CreatedTransaction, Priority } from 'react-native-beldex-core'
 
-import { currencyInfo } from './moneroInfo'
-import { DATA_STORE_FILE, MoneroLocalData } from './MoneroLocalData'
-import { MoneroTools } from './MoneroTools'
+import { currencyInfo } from './beldexInfo'
+import { DATA_STORE_FILE, BeldexLocalData } from './BeldexLocalData'
+import { BeldexTools } from './BeldexTools'
 import {
-  asMoneroInitOptions,
-  asMoneroUserSettings,
+  asBeldexInitOptions,
+  asBeldexUserSettings,
   asPrivateKeys,
   asSafeWalletInfo,
   makeSafeWalletInfo,
-  MoneroUserSettings,
+  BeldexUserSettings,
   PrivateKeys,
   SafeWalletInfo
-} from './moneroTypes'
+} from './beldexTypes'
 import {
   CreateTransactionOptions,
-  MyMoneroApi,
+  BeldexApi,
   ParsedTransaction
-} from './MyMoneroApi'
+} from './BeldexApi'
 import { cleanTxLogs, normalizeAddress } from './utils'
 
 const SYNC_INTERVAL_MILLISECONDS = 5000
@@ -57,7 +57,7 @@ const SAVE_DATASTORE_MILLISECONDS = 10000
 
 const PRIMARY_CURRENCY = currencyInfo.currencyCode
 
-export class MoneroEngine implements EdgeCurrencyEngine {
+export class BeldexEngine implements EdgeCurrencyEngine {
   apiKey: string
   walletInfo: SafeWalletInfo
   edgeTxLibCallbacks: EdgeCurrencyEngineCallbacks
@@ -65,27 +65,27 @@ export class MoneroEngine implements EdgeCurrencyEngine {
   engineOn: boolean
   loggedIn: boolean
   addressesChecked: boolean
-  walletLocalData!: MoneroLocalData
+  walletLocalData!: BeldexLocalData
   walletLocalDataDirty: boolean
   transactionsChangedArray: EdgeTransaction[]
   currencyInfo: EdgeCurrencyInfo
   allTokens: EdgeMetaToken[]
-  myMoneroApi: MyMoneroApi
-  currentSettings: MoneroUserSettings
+  BeldexApi: BeldexApi
+  currentSettings: BeldexUserSettings
   timers: any
   walletId: string
   io: EdgeIo
   log: EdgeLog
-  currencyTools: MoneroTools
+  currencyTools: BeldexTools
 
   constructor(
     env: EdgeCorePluginOptions,
-    tools: MoneroTools,
+    tools: BeldexTools,
     walletInfo: EdgeWalletInfo,
     opts: EdgeCurrencyEngineOptions
   ) {
     const { callbacks, userSettings = {}, walletLocalDisklet } = opts
-    const initOptions = asMoneroInitOptions(env.initOptions ?? {})
+    const initOptions = asBeldexInitOptions(env.initOptions ?? {})
     const { networkInfo } = tools
 
     this.apiKey = initOptions.apiKey
@@ -100,7 +100,7 @@ export class MoneroEngine implements EdgeCurrencyEngine {
     this.walletId = walletInfo.id
     this.currencyInfo = currencyInfo
     this.currencyTools = tools
-    this.myMoneroApi = new MyMoneroApi(tools.cppBridge, {
+    this.BeldexApi = new BeldexApi(tools.cppBridge, {
       apiKey: initOptions.apiKey,
       apiServer: networkInfo.defaultServer,
       fetch: env.io.fetch,
@@ -113,21 +113,21 @@ export class MoneroEngine implements EdgeCurrencyEngine {
 
     this.currentSettings = {
       ...currencyInfo.defaultSettings,
-      ...asMoneroUserSettings(userSettings)
+      ...asBeldexUserSettings(userSettings)
     }
     if (
       this.currentSettings.enableCustomServers &&
-      this.currentSettings.moneroLightwalletServer != null
+      this.currentSettings.beldexLightwalletServer != null
     ) {
-      this.myMoneroApi.changeServer(
-        this.currentSettings.moneroLightwalletServer,
+      this.BeldexApi.changeServer(
+        this.currentSettings.beldexLightwalletServer,
         ''
       )
     }
 
     // Hard coded for testing
     // this.walletInfo.keys.moneroKey = '389b07b3466eed587d6bdae09a3613611de9add2635432d6cd1521af7bbc3757'
-    // this.walletInfo.keys.moneroAddress = '0x9fa817e5A48DD1adcA7BEc59aa6E3B1F5C4BeA9a'
+    // this.walletInfo.keys.beldexAddress = '0x9fa817e5A48DD1adcA7BEc59aa6E3B1F5C4BeA9a'
     this.edgeTxLibCallbacks = callbacks
     this.walletLocalDisklet = walletLocalDisklet
 
@@ -167,11 +167,11 @@ export class MoneroEngine implements EdgeCurrencyEngine {
   // **********************************************
   async loginIfNewAddress(privateKeys: PrivateKeys): Promise<void> {
     try {
-      const result = await this.myMoneroApi.login({
-        address: this.walletInfo.keys.moneroAddress,
-        privateViewKey: this.walletInfo.keys.moneroViewKeyPrivate,
-        privateSpendKey: privateKeys.moneroSpendKeyPrivate,
-        publicSpendKey: privateKeys.moneroSpendKeyPublic
+      const result = await this.BeldexApi.login({
+        address: this.walletInfo.keys.beldexAddress,
+        privateViewKey: this.walletInfo.keys.beldexViewKeyPrivate,
+        privateSpendKey: privateKeys.beldexSpendKeyPrivate,
+        publicSpendKey: privateKeys.beldexSpendKeyPublic
       })
       if ('new_address' in result && !this.loggedIn) {
         this.loggedIn = true
@@ -180,7 +180,7 @@ export class MoneroEngine implements EdgeCurrencyEngine {
         this.addToLoop('saveWalletLoop', SAVE_DATASTORE_MILLISECONDS)
       }
     } catch (e) {
-      this.log.error('Error logging into mymonero', e)
+      this.log.error('Error logging into beldex', e)
     }
   }
 
@@ -189,11 +189,11 @@ export class MoneroEngine implements EdgeCurrencyEngine {
   // ***************************************************
   async checkAddressInnerLoop(privateKeys: PrivateKeys): Promise<void> {
     try {
-      const addrResult = await this.myMoneroApi.getAddressInfo({
-        address: this.walletInfo.keys.moneroAddress,
-        privateViewKey: this.walletInfo.keys.moneroViewKeyPrivate,
-        privateSpendKey: privateKeys.moneroSpendKeyPrivate,
-        publicSpendKey: privateKeys.moneroSpendKeyPublic
+      const addrResult = await this.BeldexApi.getAddressInfo({
+        address: this.walletInfo.keys.beldexAddress,
+        privateViewKey: this.walletInfo.keys.beldexViewKeyPrivate,
+        privateSpendKey: privateKeys.beldexSpendKeyPrivate,
+        publicSpendKey: privateKeys.beldexSpendKeyPublic
       })
 
       if (this.walletLocalData.blockHeight !== addrResult.blockHeight) {
@@ -214,13 +214,13 @@ export class MoneroEngine implements EdgeCurrencyEngine {
     } catch (e) {
       this.log.error(
         `Error fetching address info: ${
-          this.walletInfo.keys.moneroAddress
+          this.walletInfo.keys.beldexAddress
         } ${String(e)}`
       )
     }
   }
 
-  processMoneroTransaction(tx: ParsedTransaction): void {
+  processBeldexTransaction(tx: ParsedTransaction): void {
     const ourReceiveAddresses: string[] = []
 
     const nativeNetworkFee: string = tx.fee != null ? tx.fee : '0'
@@ -228,7 +228,7 @@ export class MoneroEngine implements EdgeCurrencyEngine {
     const netNativeAmount: string = sub(tx.total_received, tx.total_sent)
 
     if (netNativeAmount.slice(0, 1) !== '-') {
-      ourReceiveAddresses.push(this.walletInfo.keys.moneroAddress.toLowerCase())
+      ourReceiveAddresses.push(this.walletInfo.keys.beldexAddress.toLowerCase())
     }
 
     let blockHeight = tx.height
@@ -309,11 +309,11 @@ export class MoneroEngine implements EdgeCurrencyEngine {
     // }
 
     try {
-      const transactions = await this.myMoneroApi.getTransactions({
-        address: this.walletInfo.keys.moneroAddress,
-        privateViewKey: this.walletInfo.keys.moneroViewKeyPrivate,
-        privateSpendKey: privateKeys.moneroSpendKeyPrivate,
-        publicSpendKey: privateKeys.moneroSpendKeyPublic
+      const transactions = await this.BeldexApi.getTransactions({
+        address: this.walletInfo.keys.beldexAddress,
+        privateViewKey: this.walletInfo.keys.beldexViewKeyPrivate,
+        privateSpendKey: privateKeys.beldexSpendKeyPrivate,
+        publicSpendKey: privateKeys.beldexSpendKeyPublic
       })
 
       this.log(`Fetched transactions count: ${transactions.length}`)
@@ -322,7 +322,7 @@ export class MoneroEngine implements EdgeCurrencyEngine {
       // Iterate over transactions in address
       for (let i = 0; i < transactions.length; i++) {
         const tx = transactions[i]
-        this.processMoneroTransaction(tx)
+        this.processBeldexTransaction(tx)
         if (i % 10 === 0) {
           this.updateOnAddressesChecked(i, transactions.length)
         }
@@ -444,18 +444,18 @@ export class MoneroEngine implements EdgeCurrencyEngine {
   async changeUserSettings(userSettings: JsonObject): Promise<void> {
     this.currentSettings = {
       ...this.currencyInfo.defaultSettings,
-      ...asMoneroUserSettings(userSettings)
+      ...asBeldexUserSettings(userSettings)
     }
     if (
       this.currentSettings.enableCustomServers &&
-      this.currentSettings.moneroLightwalletServer != null
+      this.currentSettings.beldexLightwalletServer != null
     ) {
-      this.myMoneroApi.changeServer(
-        this.currentSettings.moneroLightwalletServer,
+      this.BeldexApi.changeServer(
+        this.currentSettings.beldexLightwalletServer,
         ''
       )
     } else {
-      this.myMoneroApi.changeServer(
+      this.BeldexApi.changeServer(
         this.currencyTools.networkInfo.defaultServer,
         this.apiKey
       )
@@ -480,14 +480,14 @@ export class MoneroEngine implements EdgeCurrencyEngine {
 
   async resyncBlockchain(): Promise<void> {
     await this.killEngine()
-    this.myMoneroApi.keyImageCache = {}
+    this.BeldexApi.keyImageCache = {}
     const temp = JSON.stringify({
       enabledTokens: this.walletLocalData.enabledTokens,
       // networkFees: this.walletLocalData.networkFees,
-      moneroAddress: this.walletInfo.keys.moneroAddress,
-      moneroViewKeyPrivate: this.walletInfo.keys.moneroViewKeyPrivate
+      beldexAddress: this.walletInfo.keys.beldexAddress,
+      beldexViewKeyPrivate: this.walletInfo.keys.beldexViewKeyPrivate
     })
-    this.walletLocalData = new MoneroLocalData(temp)
+    this.walletLocalData = new BeldexLocalData(temp)
     this.walletLocalDataDirty = true
     this.addressesChecked = false
     await this.saveWalletLoop()
@@ -568,7 +568,7 @@ export class MoneroEngine implements EdgeCurrencyEngine {
   async getFreshAddress(
     options: EdgeGetReceiveAddressOptions
   ): Promise<EdgeFreshAddress> {
-    return { publicAddress: this.walletInfo.keys.moneroAddress }
+    return { publicAddress: this.walletInfo.keys.beldexAddress }
   }
 
   async addGapLimitAddresses(addresses: string[]): Promise<void> {}
@@ -595,21 +595,21 @@ export class MoneroEngine implements EdgeCurrencyEngine {
       targetAddress: publicAddress
     }
 
-    const result = await this.createMyMoneroTransaction(options, privateKeys)
+    const result = await this.createBeldexTransaction(options, privateKeys)
     return result.final_total_wo_fee
   }
 
-  async createMyMoneroTransaction(
+  async createBeldexTransaction(
     options: CreateTransactionOptions,
     privateKeys: PrivateKeys
   ): Promise<CreatedTransaction> {
     try {
-      return await this.myMoneroApi.createTransaction(
+      return await this.BeldexApi.createTransaction(
         {
-          address: this.walletInfo.keys.moneroAddress,
-          privateViewKey: this.walletInfo.keys.moneroViewKeyPrivate,
-          privateSpendKey: privateKeys.moneroSpendKeyPrivate,
-          publicSpendKey: privateKeys.moneroSpendKeyPublic
+          address: this.walletInfo.keys.beldexAddress,
+          privateViewKey: this.walletInfo.keys.beldexViewKeyPrivate,
+          privateSpendKey: privateKeys.beldexSpendKeyPrivate,
+          publicSpendKey: privateKeys.beldexSpendKeyPublic
         },
         options
       )
@@ -630,7 +630,7 @@ export class MoneroEngine implements EdgeCurrencyEngine {
     const { memos = [] } = edgeSpendInfo
     const privateKeys = asPrivateKeys(opts?.privateKeys)
 
-    // Monero can only have one output
+    // Beldex can only have one output
     // TODO: The new SDK fixes this!
     if (edgeSpendInfo.spendTargets.length !== 1) {
       throw new Error('Error: only one output allowed')
@@ -661,7 +661,7 @@ export class MoneroEngine implements EdgeCurrencyEngine {
     }
     this.log(`Creating transaction: ${JSON.stringify(options, null, 1)}`)
 
-    const result: CreatedTransaction = await this.createMyMoneroTransaction(
+    const result: CreatedTransaction = await this.createBeldexTransaction(
       options,
       privateKeys
     )
@@ -671,7 +671,7 @@ export class MoneroEngine implements EdgeCurrencyEngine {
     this.log(`Total sent: ${result.total_sent}, Fee: ${result.used_fee}`)
     const edgeTransaction: EdgeTransaction = {
       blockHeight: 0, // blockHeight
-      currencyCode: 'XMR', // currencyCode
+      currencyCode: 'BDX', // currencyCode
       date,
       isSend: true,
       memos,
@@ -699,7 +699,7 @@ export class MoneroEngine implements EdgeCurrencyEngine {
     edgeTransaction: EdgeTransaction
   ): Promise<EdgeTransaction> {
     try {
-      await this.myMoneroApi.broadcastTransaction(edgeTransaction.signedTx)
+      await this.BeldexApi.broadcastTransaction(edgeTransaction.signedTx)
       this.log.warn(`broadcastTx success ${cleanTxLogs(edgeTransaction)}`)
       return edgeTransaction
     } catch (e) {
@@ -708,7 +708,7 @@ export class MoneroEngine implements EdgeCurrencyEngine {
       )
       if (e instanceof Error && e.message.includes(' 422 ')) {
         throw new Error(
-          'The Monero network rejected this transaction. You may need to wait for more confirmations'
+          'The Beldex network rejected this transaction. You may need to wait for more confirmations'
         )
       } else {
         throw e
@@ -724,12 +724,12 @@ export class MoneroEngine implements EdgeCurrencyEngine {
 
   getDisplayPrivateSeed(privateKeys: JsonObject): string {
     const xmrPrivateKeys = asPrivateKeys(privateKeys)
-    return xmrPrivateKeys.moneroKey
+    return xmrPrivateKeys.beldexKey
   }
 
   getDisplayPublicSeed(): string {
-    if (this.walletInfo.keys?.moneroViewKeyPrivate != null) {
-      return this.walletInfo.keys.moneroViewKeyPrivate
+    if (this.walletInfo.keys?.beldexViewKeyPrivate != null) {
+      return this.walletInfo.keys.beldexViewKeyPrivate
     }
     return ''
   }
@@ -749,29 +749,29 @@ export class MoneroEngine implements EdgeCurrencyEngine {
 }
 
 function translateFee(fee?: string): Priority {
-  if (fee === 'low') return 1
-  if (fee === 'high') return 4
-  return 2
+  if (fee === 'NORMAL') return 1
+  if (fee === 'FLASH') return 5
+  return 5
 }
 
 export async function makeCurrencyEngine(
   env: EdgeCorePluginOptions,
-  tools: MoneroTools,
+  tools: BeldexTools,
   walletInfo: EdgeWalletInfo,
   opts: EdgeCurrencyEngineOptions
 ): Promise<EdgeCurrencyEngine> {
   const safeWalletInfo = asSafeWalletInfo(walletInfo)
 
-  const engine = new MoneroEngine(env, tools, safeWalletInfo, opts)
+  const engine = new BeldexEngine(env, tools, safeWalletInfo, opts)
   await engine.init()
   try {
     const result = await engine.walletLocalDisklet.getText(DATA_STORE_FILE)
-    engine.walletLocalData = new MoneroLocalData(result)
+    engine.walletLocalData = new BeldexLocalData(result)
   } catch (err) {
     try {
       opts.log(err)
       opts.log('No walletLocalData setup yet: Failure is ok')
-      engine.walletLocalData = new MoneroLocalData(null)
+      engine.walletLocalData = new BeldexLocalData(null)
       await engine.walletLocalDisklet.setText(
         DATA_STORE_FILE,
         JSON.stringify(engine.walletLocalData)

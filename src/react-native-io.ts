@@ -1,6 +1,7 @@
-import { NativeModules } from 'react-native'
-import type { NativeMyMoneroCore } from 'react-native-mymonero-core'
 
-export default function makeCustomIo(): NativeMyMoneroCore {
-  return NativeModules.MyMoneroCore
+import { NativeModules } from 'react-native'
+import type { NativeBeldexCore } from 'react-native-beldex-core'
+
+export default function makeCustomIo(): NativeBeldexCore {
+  return NativeModules.BeldexCore
 }

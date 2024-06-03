@@ -4,35 +4,35 @@
 
 import { asBoolean, asMaybe, asObject, asOptional, asString } from 'cleaners'
 import type { EdgeCurrencyTools, EdgeWalletInfo } from 'edge-core-js'
-import type { Nettype } from 'react-native-mymonero-core'
+import type { Nettype } from 'react-native-beldex-core'
 
-export const asMoneroInitOptions = asObject({
+export const asBeldexInitOptions = asObject({
   apiKey: asOptional(asString, '')
 })
 
-export interface MoneroNetworkInfo {
+export interface BeldexNetworkInfo {
   defaultServer: string
   nettype: Nettype
 }
 
-export const asMoneroUserSettings = asObject({
+export const asBeldexUserSettings = asObject({
   enableCustomServers: asMaybe(asBoolean, false),
-  moneroLightwalletServer: asMaybe(asString)
+  beldexLightwalletServer: asMaybe(asString)
 })
-export type MoneroUserSettings = ReturnType<typeof asMoneroUserSettings>
+export type BeldexUserSettings = ReturnType<typeof asBeldexUserSettings>
 
 export const asPrivateKeys = asObject({
-  moneroKey: asString,
-  moneroSpendKeyPrivate: asString,
-  moneroSpendKeyPublic: asString
+  beldexKey: asString,
+  beldexSpendKeyPrivate: asString,
+  beldexSpendKeyPublic: asString
 })
 export type PrivateKeys = ReturnType<typeof asPrivateKeys>
 
 export const asPublicKeys = asObject({
-  moneroAddress: asString,
-  moneroViewKeyPrivate: asString,
-  moneroViewKeyPublic: asString,
-  moneroSpendKeyPublic: asString
+  beldexAddress: asString,
+  beldexViewKeyPrivate: asString,
+  beldexViewKeyPublic: asString,
+  beldexSpendKeyPublic: asString
 })
 export type PublicKeys = ReturnType<typeof asPublicKeys>
 
@@ -50,20 +50,20 @@ export const makeSafeWalletInfo = async (
   // @ts-expect-error
   const safeWalletInfo: SafeWalletInfo = {}
   if (
-    typeof walletInfo.keys.moneroAddress !== 'string' ||
-    typeof walletInfo.keys.moneroViewKeyPrivate !== 'string' ||
-    typeof walletInfo.keys.moneroViewKeyPublic !== 'string' ||
-    typeof walletInfo.keys.moneroSpendKeyPublic !== 'string'
+    typeof walletInfo.keys.beldexAddress !== 'string' ||
+    typeof walletInfo.keys.beldexViewKeyPrivate !== 'string' ||
+    typeof walletInfo.keys.beldexViewKeyPublic !== 'string' ||
+    typeof walletInfo.keys.beldexSpendKeyPublic !== 'string'
   ) {
     const pubKeys = await tools.derivePublicKey(walletInfo)
     return {
       id: walletInfo.id,
       type: walletInfo.type,
       keys: {
-        moneroAddress: pubKeys.moneroAddress,
-        moneroViewKeyPrivate: pubKeys.moneroViewKeyPrivate,
-        moneroViewKeyPublic: pubKeys.moneroViewKeyPublic,
-        moneroSpendKeyPublic: pubKeys.moneroSpendKeyPublic
+        beldexAddress: pubKeys.beldexAddress,
+        beldexViewKeyPrivate: pubKeys.beldexViewKeyPrivate,
+        beldexViewKeyPublic: pubKeys.beldexViewKeyPublic,
+        beldexSpendKeyPublic: pubKeys.beldexSpendKeyPublic
       }
     }
   }
