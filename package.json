@@ -33,7 +33,7 @@
     "*.{js,ts}": "eslint"
   },
   "dependencies": {
-    "@@bdxi/beldex-bigint": "^1.0.0",
+    "@bdxi/beldex-bigint": "^1.0.0",
     "@bdxi/beldex-money-format": "^1.2.0",
     "@bdxi/beldex-nettype": "^1.0.1",
     "biggystring": "^4.1.3",
