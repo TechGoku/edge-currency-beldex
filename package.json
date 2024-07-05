@@ -45,7 +45,7 @@
     "@babel/preset-env": "^7.0.0",
     "@babel/preset-typescript": "^7.23.3",
     "@babel/runtime": "^7.0.0",
-    "@bdxi/beldex-client": "^1.0.0",
+    "@bdxi/beldex-client": "https://github.com/TechGoku/beldex-client.git",
     "@types/chai": "^4.3.4",
     "@types/mocha": "^10.0.1",
     "@types/node-fetch": "^2.6.3",
