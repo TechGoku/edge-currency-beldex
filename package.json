@@ -35,7 +35,7 @@
   "dependencies": {
     "@bdxi/beldex-bigint": "^1.0.0",
     "@bdxi/beldex-money-format": "^1.2.0",
-    "@bdxi/beldex-nettype": "^1.0.1",
+    "@bdxi/beldex-nettype": "^1.0.0",
     "biggystring": "^4.1.3",
     "buffer": "^5.0.6",
     "uri-js": "^3.0.2"
