@@ -76,8 +76,6 @@
     "webpack-cli": "^5.1.4",
     "yarn-deduplicate": "^6.0.1"
   },
-  "peerDependencies": {
-    "react-native-beldex-core": "https://github.com/TechGoku/react-native-beldex-core.git"
-  },
+ 
   "react-native": "./lib/xmrIndex.js"
 }
