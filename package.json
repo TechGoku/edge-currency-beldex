@@ -5,7 +5,7 @@
   "homepage": "https://edge.app",
   "repository": {
     "type": "git",
-    "url": "https://github.com/TechGoku/react-native-beldex-core.git"
+    "url": "https://github.com/TechGoku/edge-currency-beldex"
   },
   "license": "SEE LICENSE IN LICENSE",
   "author": "Edge (Airbitz, Inc)",
@@ -77,7 +77,7 @@
     "yarn-deduplicate": "^6.0.1"
   },
   "peerDependencies": {
-    "react-native-beldex-core": "^1.0.0"
+    "react-native-beldex-core": "https://github.com/TechGoku/react-native-beldex-core.git"
   },
   "react-native": "./lib/xmrIndex.js"
 }
