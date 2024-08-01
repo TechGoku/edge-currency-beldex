@@ -5,8 +5,8 @@ import type { NativeBeldexCore } from 'react-native-beldex-core'
 const bridgePromise: Promise<any> = makeBridge()
 
 /**
- * We are emulating the `react-native-mymonero-core` API
- * using the `@mymonero/mymonero-monero-client` WASM module.
+ * We are emulating the `react-native-beldex-core` API
+ * using the `@bdxi/beldex-client` WASM module.
  */
 const bridge: NativeBeldexCore = {
   async callBeldex(name, jsonArguments) {
