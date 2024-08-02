@@ -206,11 +206,11 @@ export class BeldexEngine implements EdgeCurrencyEngine {
 
       const nativeBalance = sub(addrResult.totalReceived, addrResult.totalSent)
 
-      if (this.walletLocalData.totalBalances.XMR !== nativeBalance) {
-        this.walletLocalData.totalBalances.XMR = nativeBalance
-        this.edgeTxLibCallbacks.onBalanceChanged('XMR', nativeBalance)
+      if (this.walletLocalData.totalBalances.BDX !== nativeBalance) {
+        this.walletLocalData.totalBalances.BDX = nativeBalance
+        this.edgeTxLibCallbacks.onBalanceChanged('BDX', nativeBalance)
       }
-      this.walletLocalData.lockedXmrBalance = addrResult.lockedBalance
+      this.walletLocalData.lockedBdxBalance = addrResult.lockedBalance
     } catch (e) {
       this.log.error(
         `Error fetching address info: ${
@@ -251,7 +251,7 @@ export class BeldexEngine implements EdgeCurrencyEngine {
 
     let edgeTransaction: EdgeTransaction = {
       blockHeight,
-      currencyCode: 'XMR',
+      currencyCode: 'BDX',
       date,
       isSend: lt(netNativeAmount, '0'),
       memos,
@@ -495,17 +495,17 @@ export class BeldexEngine implements EdgeCurrencyEngine {
   }
 
   async syncNetwork(opts: EdgeEnginePrivateKeyOptions): Promise<number> {
-    const xmrPrivateKeys = asPrivateKeys(opts.privateKeys)
+    const bdxPrivateKeys = asPrivateKeys(opts.privateKeys)
 
     // Login only if not logged in
     if (!this.loggedIn) {
-      await this.loginIfNewAddress(xmrPrivateKeys)
+      await this.loginIfNewAddress(bdxPrivateKeys)
     }
 
     // Always check address
-    await this.checkAddressInnerLoop(xmrPrivateKeys)
+    await this.checkAddressInnerLoop(bdxPrivateKeys)
     // Always check transactions
-    await this.checkTransactionsInnerLoop(xmrPrivateKeys)
+    await this.checkTransactionsInnerLoop(bdxPrivateKeys)
 
     return SYNC_INTERVAL_MILLISECONDS
   }
@@ -616,8 +616,8 @@ export class BeldexEngine implements EdgeCurrencyEngine {
     } catch (e: any) {
       // This error is specific to mymonero-core-js: github.com/mymonero/mymonero-core-cpp/blob/a53e57f2a376b05bb0f4d851713321c749e5d8d9/src/monero_transfer_utils.hpp#L112-L162
       this.log.error(e.message)
-      const regex = / Have (\d*\.?\d+) XMR; need (\d*\.?\d+) XMR./gm
-      const subst = `\nHave: $1 XMR.\nNeed: $2 XMR.`
+      const regex = / Have (\d*\.?\d+) BDX; need (\d*\.?\d+) BDX./gm
+      const subst = `\nHave: $1 BDX.\nNeed: $2 BDX.`
       const msgFormatted = e.message.replace(regex, subst)
       throw new Error(msgFormatted)
     }
@@ -645,8 +645,8 @@ export class BeldexEngine implements EdgeCurrencyEngine {
       throw new NoAmountSpecifiedError()
     }
 
-    if (gte(nativeAmount, this.walletLocalData.totalBalances.XMR)) {
-      if (gte(this.walletLocalData.lockedXmrBalance, nativeAmount)) {
+    if (gte(nativeAmount, this.walletLocalData.totalBalances.BDX)) {
+      if (gte(this.walletLocalData.lockedBdxBalance, nativeAmount)) {
         throw new PendingFundsError()
       } else {
         throw new InsufficientFundsError()
@@ -723,8 +723,8 @@ export class BeldexEngine implements EdgeCurrencyEngine {
   }
 
   getDisplayPrivateSeed(privateKeys: JsonObject): string {
-    const xmrPrivateKeys = asPrivateKeys(privateKeys)
-    return xmrPrivateKeys.beldexKey
+    const bdxPrivateKeys = asPrivateKeys(privateKeys)
+    return bdxPrivateKeys.beldexKey
   }
 
   getDisplayPublicSeed(): string {

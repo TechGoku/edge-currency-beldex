@@ -57,7 +57,7 @@ const asNumberBoolean: Cleaner<boolean> = raw => {
 }
 
 const asSpentOutput = asObject({
-  amount: asString, // XMR possibly being spent
+  amount: asString, // BDX possibly being spent
   key_image: asString, // Bytes of the key image
   mixin: asNumber, // Mixin of the spend
   out_index: asNumber, // Index of source output
@@ -100,14 +100,14 @@ export type LoginResult = ReturnType<typeof asLoginResponse>
 
 const asAddressInfoResponse = asObject({
   blockchain_height: asNumber, // Current blockchain height
-  locked_funds: asString, // Sum of unspendable XMR
+  locked_funds: asString, // Sum of unspendable BDX
   rates: asOptional(asObject(asNumber)), // Rates
   scanned_block_height: asNumber, // Current scan progress
   scanned_height: asNumber, // Current tx scan progress
   spent_outputs: asOptional(asArray(asSpentOutput)), // Possible spend info
   start_height: asNumber, // Start height of response
-  total_received: asString, // Sum of received XMR
-  total_sent: asString, // Sum of possibly spent XMR
+  total_received: asString, // Sum of received BDX
+  total_sent: asString, // Sum of possibly spent BDX
   transaction_height: asNumber // Total txes sent in Beldex
 })
 
@@ -130,8 +130,8 @@ const asGetAddressTxsResponse = asObject({
         payment_id: asOptional(asString), // Bytes of tx payment id
         spent_outputs: asOptional(asArray(asSpentOutput)), // List of possible spends
         timestamp: asString, // Timestamp of block
-        total_received: asString, // Total XMR received
-        total_sent: asString, // XMR possibly being spent
+        total_received: asString, // Total BDX received
+        total_sent: asString, // BDX possibly being spent
         unlock_time: asNumber // Tx unlock time field
       })
     ),

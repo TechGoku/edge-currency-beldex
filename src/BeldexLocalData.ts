@@ -8,7 +8,7 @@ export const PRIMARY_CURRENCY = currencyInfo.currencyCode
 export class BeldexLocalData {
   blockHeight: number
   lastAddressQueryHeight: number
-  lockedXmrBalance: string
+  lockedBdxBalance: string
   nextNonce: string
   hasLoggedIn: boolean
   totalBalances: { [currencyCode: string]: string }
@@ -18,13 +18,13 @@ export class BeldexLocalData {
   constructor(jsonString: string | null) {
     this.blockHeight = 0
 
-    const totalBalances: { [currencyCode: string]: string } = { XMR: '0' }
+    const totalBalances: { [currencyCode: string]: string } = { BDX: '0' }
     this.totalBalances = totalBalances
 
     this.nextNonce = '0'
 
     this.lastAddressQueryHeight = 0
-    this.lockedXmrBalance = '0'
+    this.lockedBdxBalance = '0'
 
     // Dumb extra local var needed to make Flow happy
     const transactionsObj: {
@@ -46,8 +46,8 @@ export class BeldexLocalData {
       if (typeof data.lastAddressQueryHeight === 'string') {
         this.lastAddressQueryHeight = data.lastAddressQueryHeight
       }
-      if (typeof data.lockedXmrBalance === 'string') {
-        this.lockedXmrBalance = data.lockedXmrBalance
+      if (typeof data.lockedBdxBalance === 'string') {
+        this.lockedBdxBalance = data.lockedBdxBalance
       }
       if (typeof data.totalBalances !== 'undefined') {
         this.totalBalances = data.totalBalances

@@ -80,5 +80,5 @@
     "react-native-beldex-core": "https://github.com/TechGoku/react-native-beldex-core.git"
   },
 
-  "react-native": "./lib/xmrIndex.js"
+  "react-native": "./lib/bdxIndex.js"
 }
